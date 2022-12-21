@@ -1,0 +1,46 @@
+﻿@model eKitap.Models.Student
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Öğrenci Ekle";
+    ViewData["Page"] = "students";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h4>Öğrenciler</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">İsim</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">T.C No</label>
+                <input asp-for="TcId" class="form-control" />
+                <span asp-validation-for="TcId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Şifre</label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Sınıf</label>
+                <select asp-for="ClassRoomId" class ="form-control" asp-items="ViewBag.ClassRoomId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
+                <a class="btn btn-info" asp-action="Index"><i class="fas fa-backward"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,46 @@
+﻿@model IEnumerable<eKitap.Models.ClassRoom>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Sınıflar";
+    ViewData["Page"] = "classRooms";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<p>
+    <a class="btn btn-success" asp-action="Create">
+        <i class="fas fa-plus"></i>
+    </a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                İsim
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td class="buttons">
+                    <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.Id">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <a class="btn btn-success" asp-action="Details" asp-route-id="@item.Id">
+                        <i class="fas fa-book-open"></i>
+                    </a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,47 @@
+﻿@model List<eKitap.Models.BookStudentConnection>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Ayrıntılar";
+    ViewData["Page"] = "students";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table class="table">
+<thead>
+<tr>
+    <th>
+        Kitap İsmi
+    </th>
+    <th>
+        Öğrenci Yorumu
+    </th>
+    <th>
+        Öğrenci Puanı
+    </th>
+    <th>
+        Kalınan Sayfa
+    </th>
+</tr>
+</thead>
+<tbody>
+@foreach (var item in Model)
+{
+    <tr>
+    <td>
+        <a href="/Books/@item.Book.PdfName" target="_blank">@item.Book.Name</a>
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Comment)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Rate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.CurrentPage)
+    </td>
+    </tr>
+}
+</tbody>
+</table>
+<a class="btn btn-info" asp-action="Index"><i class="fas fa-backward"></i></a>

@@ -1,0 +1,76 @@
+﻿@model IEnumerable<eKitap.Models.Book>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Kitaplar";
+    ViewData["Page"] = "books";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<p>
+    <a class="btn btn-success" asp-action="Create">
+        <i class="fas fa-plus"></i>
+    </a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                İsim
+            </th>
+            <th>
+                Sınıf
+            </th>
+            <th>
+                İndirilme Sayısı
+            </th>
+            <th>
+                Pdf İsmi
+            </th>
+            <th>
+                Oluşturma Tarihi
+            </th>
+            <th>
+                Son Düzenlenen Tarih
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClassRoom.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BookStudentConnections.Count)
+                </td>
+                <td>
+                    <a href="/Books/@item.PdfName" target="_blank">Kitabı Göster</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreateDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastUpdateDate)
+                </td>
+                <td class="buttons">
+                    <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.Id">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <a class="btn btn-success" asp-action="Details" asp-route-id="@item.Id">
+                        <i class="fas fa-info"></i>
+                    </a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

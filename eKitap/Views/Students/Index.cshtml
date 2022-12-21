@@ -1,0 +1,75 @@
+﻿@model IEnumerable<eKitap.Models.Student>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Öğrenciler";
+    ViewData["Page"] = "students";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+    <a class="btn btn-success" asp-action="Create">
+        <i class="fas fa-plus"></i>
+    </a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                İsim
+            </th>
+            <th>
+                T.C No
+            </th>
+            <th>
+                Şifre
+            </th>
+            <th>
+                Sınıf
+            </th>
+            <th>
+                Oluşturma Tarihi
+            </th>
+            <th>
+                Son Düzenleme Tarihi
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TcId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Password)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClassRoom.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreateDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastUpdateDate)
+                </td>
+                <td class="buttons">
+                    <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.Id">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <a class="btn btn-success" asp-action="Details" asp-route-id="@item.Id">
+                        <i class="fas fa-book-open"></i>
+                    </a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
