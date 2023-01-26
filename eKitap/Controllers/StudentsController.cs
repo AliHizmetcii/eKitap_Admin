@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using eKitap.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Data;
 
 namespace eKitap.Controllers
 {
@@ -49,7 +44,7 @@ namespace eKitap.Controllers
         // GET: Students/Create
         public IActionResult Create()
         {
-            ViewData["ClassRoomId"] = new SelectList(_context.ClassRoom, "Id", "Id");
+            ViewData["ClassRoomId"] = new SelectList(_context.ClassRoom, "Id", "Title");
             return View();
         }
 
@@ -89,7 +84,7 @@ namespace eKitap.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClassRoomId"] = new SelectList(_context.ClassRoom, "Id", "Id", student.ClassRoomId);
+            ViewData["ClassRoomId"] = new SelectList(_context.ClassRoom, "Id", "Title", student.ClassRoomId);
             return View(student);
         }
 
@@ -106,6 +101,8 @@ namespace eKitap.Controllers
             }
 
             ModelState.Remove("password");
+            ModelState.Remove("ClassRoom");
+            ModelState.Remove("BookStudentConnections");
             if (ModelState.IsValid)
             {
                 try
@@ -117,6 +114,7 @@ namespace eKitap.Controllers
                         if (!string.IsNullOrEmpty(student.Password))
                             item.Password = student.Password;
                         item.LastUpdateDate = DateTime.Now;
+                        item.ClassRoomId = student.ClassRoomId;
                         await _context.SaveChangesAsync();
                     }
                 }
@@ -174,6 +172,25 @@ namespace eKitap.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [ActionName("Approve")]
+        public async Task<IActionResult> Approve(int id)
+        {
+            if (_context.Student == null)
+            {
+                return Problem("Entity set 'eKitapDbContext.Student'  is null.");
+            }
+            var student = await _context.Student.FindAsync(id);
+            if (student != null)
+            {
+                student.ApproveStatus = true;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
 
         private bool StudentExists(int id)
         {

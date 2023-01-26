@@ -1,4 +1,4 @@
-﻿@model List<eKitap.Models.BookStudentConnection>
+﻿@model eKitap.Models.BookStudentConnection
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Detaylar";
@@ -13,25 +13,31 @@
            Öğrenci İsmi
         </th>
         <th>
-            Öğrenci Yorumu
+            Kitap İsmi
         </th>
         <th>
-            Öğrenci Puanı
+            Sayfa Numarası
+        </th>
+        <th>
+            Öğrenci Yorumu
         </th>
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model)
+    @foreach (var item in Model.Comments)
     {
         <tr>
             <td>
-            @item.Student.Name
+            @Model.Student.Name
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Comment)
+            @Model.Book.Name
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Rate)
+                @Html.DisplayFor(modelItem => item.PageNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Text)
             </td>
         </tr>
     }

@@ -50,7 +50,7 @@
                     @Html.DisplayFor(modelItem => item.Password)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ClassRoom.Id)
+                    @Html.DisplayFor(modelItem => item.ClassRoom.Title)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CreateDate)
@@ -59,10 +59,15 @@
                     @Html.DisplayFor(modelItem => item.LastUpdateDate)
                 </td>
                 <td class="buttons">
+                    @if(!item.ApproveStatus){
+                        <a class="btn btn-success" asp-action="Approve" asp-route-id="@item.Id">
+                            <i class="fas fa-check"></i>
+                        </a>
+                    }
                     <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.Id">
                         <i class="fas fa-pen"></i>
                     </a>
-                    <a class="btn btn-success" asp-action="Details" asp-route-id="@item.Id">
+                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">
                         <i class="fas fa-book-open"></i>
                     </a>
                     <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">

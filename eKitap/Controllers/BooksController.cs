@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using eKitap.Models;
-using Microsoft.AspNetCore.Http;
-using System.Data;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
+
 
 
 namespace eKitap.Controllers
@@ -48,7 +45,7 @@ namespace eKitap.Controllers
                 return NotFound();
             }
 
-            return View(await _context.BookStudentConnections.Where(c => c.BookId == id && !c.IsDeleted).Include(c => c.Student).ToListAsync());
+            return View(await _context.BookStudentConnections.Include(c => c.Comments).Include(c => c.Book).Include(c => c.Student).Where(c => c.Id == id && !c.IsDeleted).FirstOrDefaultAsync());
 
         }
 
@@ -68,12 +65,13 @@ namespace eKitap.Controllers
         {
             if (Request.Form.Files.Count == 1)
                 ModelState.Remove("PdfName");
+
             ModelState.Remove("ClassRoom");
             ModelState.Remove("BookStudentConnections");
 
             if (ModelState.IsValid)
             {
-                var file = Request.Form.Files.First();
+                var file = Request.Form.Files.FirstOrDefault();
                 book.PdfName = await SavePdfFile(file, Path.Combine(_env.WebRootPath, "Books"));
                 book.CreateDate = DateTime.Now;
                 book.LastUpdateDate = DateTime.Now;
@@ -212,6 +210,29 @@ namespace eKitap.Controllers
             }
 
             return fileName;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddChapter(string chapterName, int bookId)
+        {
+            var model = await _context.Kitaplar.FirstOrDefaultAsync(c => c.Id == bookId);
+            if (model != null)
+            {
+                model.ChapterName = !string.IsNullOrEmpty(chapterName) ? chapterName : "[]";
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> EditChapter(int Id)
+        {
+            var book = await _context.Kitaplar.FirstOrDefaultAsync(c => c.Id == Id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return View("Chapter", book);
         }
     }
 }

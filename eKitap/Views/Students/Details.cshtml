@@ -8,40 +8,40 @@
 }
 
 <table class="table">
-<thead>
-<tr>
-    <th>
-        Kitap İsmi
-    </th>
-    <th>
-        Öğrenci Yorumu
-    </th>
-    <th>
-        Öğrenci Puanı
-    </th>
-    <th>
-        Kalınan Sayfa
-    </th>
-</tr>
-</thead>
-<tbody>
-@foreach (var item in Model)
-{
-    <tr>
-    <td>
-        <a href="/Books/@item.Book.PdfName" target="_blank">@item.Book.Name</a>
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Comment)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Rate)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.CurrentPage)
-    </td>
-    </tr>
-}
-</tbody>
+    <thead>
+        <tr>
+            <th>
+                Kitap İsmi
+            </th>
+            <th>
+                Öğrenci Yorumu
+            </th>
+            <th>
+                Öğrenci Puanı
+            </th>
+            <th>
+                Kalınan Sayfa
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a href="/Books/@item.Book.PdfName" target="_blank">@item.Book.Name</a>
+                </td>
+                <td>
+                    <a class="btn btn-info" asp-controller="Books" asp-action="Details" asp-route-id="@item.BookId"> Yorumları Göster</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CurrentPage)
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
 <a class="btn btn-info" asp-action="Index"><i class="fas fa-backward"></i></a>

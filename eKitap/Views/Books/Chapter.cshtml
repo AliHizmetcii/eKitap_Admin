@@ -1,0 +1,104 @@
+﻿@model eKitap.Models.Book
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Bölümler";
+    ViewData["Page"] = "books";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h4>Bölümler</h4>
+<hr />
+
+<script>
+    
+    function defer(method) {
+        if (window.jQuery) {
+            method();
+        } else {
+            setTimeout(function() { defer(method) }, 50);
+        }
+    }
+    defer(function () {
+        $(()=>{
+            function addRow(chapterName,minPage,maxPage,isEditable) {
+                var row = `<tr>
+                    <td>
+                        <input type="text" class="chapterName" value="${chapterName}" placeholder="Bölüm İsmi" required/>
+                    </td>
+                    <td>
+                            <input type="number" class="minPage" value="${minPage}" placeholder="Başlangıç sayfası" required/>
+                    </td>
+                    <td>
+                            <input type="number" class="maxPage" value="${maxPage}" placeholder="Bitiş sayfası" required/>
+                    </td>
+                    <td>
+                            <input type="checkbox" class="isEditable"${(isEditable?" checked":"")}/>
+                        Yorum Yapılabilir mi ?
+                    </td>
+                    <td>
+                            <a class="btn btn-danger deleteChapter">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>`;
+                $("#chapterTable tbody").append(row);
+
+            }
+            $("#addNewChapter").on("click",function(){
+                addRow("", "", "", false);
+            });
+            $("#chapterForm").on("submit",function(){
+                var jsonList=[];
+                $.each($("#chapterTable tbody tr"),function(i,j){
+                   jsonList.push({ ChapterName: $(j).find(".chapterName").val(), MinPage: parseInt($(j).find(".minPage").val()), MaxPage: parseInt($(j).find(".maxPage").val()), IsEditable: $(j).find(".isEditable").prop("checked") });
+                });
+                    $("#chapterNameInput").val(JSON.stringify(jsonList));
+            });
+            $("#chapterTable").on("click", ".deleteChapter",
+                function() {
+                    $(this).closest("tr").remove();
+                });
+            var tablo = JSON.parse('@Html.Raw(!string.IsNullOrEmpty(Model.ChapterName)?Model.ChapterName:"[]")');
+                $.each(tablo,function(i,j){
+                    addRow(j.ChapterName,j.MinPage,j.MaxPage,j.IsEditable);
+                })
+        });
+
+
+    });
+    //tablo.push({name='Giriş Bölğm',minPage=0,maxPage:3});
+</script>
+<p>
+    <a class="btn btn-success" id="addNewChapter">
+        <i class="fas fa-plus"></i>
+    </a>
+</p>
+<form id="chapterForm" asp-action="AddChapter" method="Post">
+    <input type="hidden" name="chapterName" id="chapterNameInput"/>
+    <input type="hidden" name="bookId" value="@Model.Id"/>
+<table class="table" id="chapterTable">
+    <thead>
+        <tr>
+            <th>
+                Bölüm İsmi
+            </th>
+            <th>
+                Başlangıç Sayfası
+            </th>
+            <th>
+                Bitiş Sayfası
+            </th>
+            <th>
+                Yorum Yapılabilir mi ?
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<button type="submit" class="btn btn-primary" id="saveChapter"><i class="fas fa-save"></i></button>
+    <a class="btn btn-info" asp-action="Index"><i class="fas fa-backward"></i></a>
+</form>

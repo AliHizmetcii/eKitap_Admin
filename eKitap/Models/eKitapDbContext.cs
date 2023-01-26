@@ -12,9 +12,10 @@ namespace eKitap.Models
 
         public DbSet<Book> Kitaplar { get; set; }
         public DbSet<Admin> AdminUsers { get; set; }
-        public DbSet<eKitap.Models.ClassRoom> ClassRoom { get; set; }
-        public DbSet<eKitap.Models.Student> Student { get; set; }
-        public DbSet<eKitap.Models.BookStudentConnection> BookStudentConnections { get; set; }
+        public DbSet<ClassRoom> ClassRoom { get; set; }
+        public DbSet<Student> Student { get; set; }
+        public DbSet<Comment> Comment { get; set; }
+        public DbSet<BookStudentConnection> BookStudentConnections { get; set; }
 
 
     }

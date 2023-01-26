@@ -10,6 +10,7 @@ namespace eKitap.Models
         public int ClassRoomId { get; set; }
         public int DownlaodCount { get; set; }
         public string PdfName { get; set; }
+        public string? ChapterName { get; set; }
         public ICollection<BookStudentConnection> BookStudentConnections { get; set; }
     }
 }

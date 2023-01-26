@@ -1,14 +1,10 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Security.Claims;
 using eKitap.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using NuGet.Protocol;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace eKitap.Controllers
@@ -24,12 +20,22 @@ namespace eKitap.Controllers
             _configuration = configuration;
         }
         [Authorize]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            ViewBag.BookCount = await _db.Kitaplar.Where(c => !c.IsDeleted).CountAsync();
+            ViewBag.StudentsCount = await _db.Student.Where(c => !c.IsDeleted).CountAsync();
+            ViewBag.NotApprovedStudents = await _db.Student.Where(c => !c.IsDeleted && !c.ApproveStatus).CountAsync();
+            ViewBag.LastComments = await _db.Comment.Include(c=>c.Connection).ThenInclude(c=>c.Student).Include(c=>c.Connection).ThenInclude(c=>c.Book).Where(c => !c.IsDeleted).AsNoTracking().OrderByDescending(c=>c.LastUpdateDate).Take(5)
+                .Select(c=>new
+                {
+                    StudentName=c.Connection.Student.Name,
+                    BookName=c.Connection.Book.Name,
+                    Comment=c.Text,
+                    c.PageNo
+                }).ToListAsync();
             return View();
 
         }
-
         public class LoginModel
         {
             public string Username { get; set; }
@@ -53,8 +59,8 @@ namespace eKitap.Controllers
                     return View(model: "Kullanıcı Adı veya Şifre Hatalı");
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Role, "Admin"),
-                    new Claim(ClaimTypes.Name, user.Name),
+                    new(ClaimTypes.Role, "Admin"),
+                    new(ClaimTypes.Name, user.Name),
                 };
 
                 var claimsIdentity = new ClaimsIdentity(
@@ -80,37 +86,48 @@ namespace eKitap.Controllers
         [Consumes("application/json")]
         public async Task<IActionResult> Login([FromBody] LoginModel lm)
         {
-            var user = _db.Student.FirstOrDefault(c => c.TcId == lm.Username && c.Password == lm.Password&& !c.IsDeleted);
+            var user = _db.Student.FirstOrDefault(c => c.TcId == lm.Username && c.Password == lm.Password && !c.IsDeleted);
             if (user == null)
                 return NotFound(new { Success = false, Message = "Kullanıcı Adı veya Şifre Hatalı" });
             if (!user.ApproveStatus)
                 return NotFound(new { Success = false, Message = "Hesabınız onaylı değil. Daha sonra tekrar deneyin" });
-            var issuer = _configuration["Jwt:Issuer"];
-            var audience = _configuration["Jwt:Audience"];
-            var key = Encoding.ASCII.GetBytes
-                (_configuration["Jwt:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var claims = new List<Claim>
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("Id", Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Name, user.Name),
-                    new Claim(JwtRegisteredClaimNames.Jti,
-                        Guid.NewGuid().ToString())
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(5),
-                Issuer = issuer,
-                Audience = audience,
-                SigningCredentials = new SigningCredentials
-                (new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha512Signature)
+                new(ClaimTypes.Role, "Student"),
+                new(ClaimTypes.Name, user.TcId),
             };
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var jwtToken = tokenHandler.WriteToken(token);
-            var stringToken = tokenHandler.WriteToken(token);
-            return Ok(new { Success = true , DisplayName = user.Name, Token= stringToken });
 
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+            return Ok(new { Success = true, DisplayName = user.Name });
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SignIn(Student student)
+        {
+            Student st = new Student();
+            st.ClassRoom = student.ClassRoom;
+            st.TcId = student.TcId;
+            st.ApproveStatus = false;
+            st.Name = student.Name;
+            st.Password = student.Password;
+
+            await _db.Student.AddAsync(st);
+            await _db.SaveChangesAsync();
+
+
+
+            return Ok(new { message = "Onay bekleniyor ..." });
         }
         public async Task<IActionResult> Logout()
         {

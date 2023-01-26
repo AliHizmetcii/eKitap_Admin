@@ -12,8 +12,8 @@ using eKitap.Models;
 namespace eKitap.Migrations
 {
     [DbContext(typeof(eKitapDbContext))]
-    [Migration("20221126131839_mig")]
-    partial class mig
+    [Migration("20230120193002_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -62,6 +62,9 @@ namespace eKitap.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("ChapterName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ClassRoomId")
                         .HasColumnType("int");
 
@@ -103,10 +106,6 @@ namespace eKitap.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
@@ -119,7 +118,7 @@ namespace eKitap.Migrations
                     b.Property<DateTime>("LastUpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<short>("Rate")
+                    b.Property<short?>("Rate")
                         .HasColumnType("smallint");
 
                     b.Property<int>("StudentId")
@@ -158,6 +157,40 @@ namespace eKitap.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ClassRooms");
+                });
+
+            modelBuilder.Entity("eKitap.Models.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("ConnectionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PageNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConnectionId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("eKitap.Models.Student", b =>
@@ -232,6 +265,17 @@ namespace eKitap.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("eKitap.Models.Comment", b =>
+                {
+                    b.HasOne("eKitap.Models.BookStudentConnection", "Connection")
+                        .WithMany("Comments")
+                        .HasForeignKey("ConnectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Connection");
+                });
+
             modelBuilder.Entity("eKitap.Models.Student", b =>
                 {
                     b.HasOne("eKitap.Models.ClassRoom", "ClassRoom")
@@ -246,6 +290,11 @@ namespace eKitap.Migrations
             modelBuilder.Entity("eKitap.Models.Book", b =>
                 {
                     b.Navigation("BookStudentConnections");
+                });
+
+            modelBuilder.Entity("eKitap.Models.BookStudentConnection", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("eKitap.Models.ClassRoom", b =>

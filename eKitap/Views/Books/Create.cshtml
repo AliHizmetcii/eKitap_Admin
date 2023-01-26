@@ -24,7 +24,8 @@
             </div>
             <div class="form-group">
                 <label class="control-label">PDF Yükle</label>
-                <input name="pdfName" type="file" required class="form-control" />
+                <input asp-for="PdfName" type="file" required class="form-control" />
+                <span asp-validation-for="PdfName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Kaydet" class="btn btn-primary" />
@@ -34,10 +35,11 @@
     </div>
 </div>
 
-
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+
     }
     }
+    
